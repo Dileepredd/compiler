@@ -11,10 +11,15 @@ class hello
     }
     static int sayhello(int t1,int t2,int t3)
     {
+        a = 1;
+        b = a+2;
+        c = b-a+3;
+        d = 5 + sayhello(a,b,c);
         return t1;
     }
     int verify(int a)
     {
+        int b;
         while(!(d==0))
         {
             d = d - 1;
@@ -23,5 +28,6 @@ class hello
         {
             return true;
         }
+        return 0;
     }
 }

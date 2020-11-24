@@ -1,6 +1,7 @@
 %{
 #include<bits/stdc++.h>
 #include "./codegen/ast.h"
+#include "./codegen/codewriter.h"
 using namespace std;
 int yylex();
 int yyerror(char *);
@@ -14,12 +15,12 @@ extern char* yytext;
   	char name[32];
 };
 %token ASS CLASSDEC STATIC_VARDEC VARDEC STATIC_ROTINE ROTINE CONSTRUCTOR
-%token PARAMLIST STATEMENTS VARLIST OBJDEC ARRAY FUNCTIONCALL METHODCALL EXPRLIST
+%token PARAMLIST STATEMENTS VARLIST CONSTRUCTORCALL ARRAY FUNCTIONCALL METHODCALL EXPRLIST
 %token THIS True False Null IF ELSE WHILE RETURN INT STATIC CLASS VOID CHAR BOOL NEW
 %token <ivalue> INTCONSTANT
-%token <name> IDENTIFIER
+%token <name> IDENTIFIER 
 %token <ivalue> CHARCONST
-%type <nptr> start programstructure classdeclarations classobjvardec classobjrotinedec 
+%type <nptr> start programstructure classdeclarations classobjvardec classobjrotinedec
 %type <nptr> constructordec rotinedec parameterslist 
 %type <nptr> statements statement vardec varlist ifstatement whilestatement returnstatement assignmentstatement 
 %type <nptr> lhs term subrotinecall keywordconstant type expr expr_list
@@ -78,23 +79,19 @@ statement: ifstatement			{$$=$1;}
 		;
 vardec: type varlist ';' {$$ = opr(VARDEC, 2, $1, $2);}
 		;
-varlist: varlist ',' lhs {$$ = opr(VARLIST, 2, $1, $3);}
-	   | lhs			 {$$ = $1;}
+varlist: varlist ',' IDENTIFIER {$$ = opr(VARLIST, 2, $1, id($3));}
+	   | IDENTIFIER			 {$$ = opr(VARLIST, 2, NULL, id($1));}
 	   ;
-type: INT   {$$=opr(INT,0);  } 
-	| CHAR  {$$=opr(CHAR,0); }
-	| BOOL  {$$=opr(BOOL,0); }
-	| VOID  {$$=opr(VOID,0); }
+type: IDENTIFIER    {$$=id($1);}
 	;
 ifstatement: IF '(' expr ')' '{' statements '}' {$$=opr(IF, 3, $3, $6, NULL);}
 		   | IF '(' expr ')' '{' statements '}' ELSE '{' statements '}' {$$=opr(IF, 3, $3, $6, $10);}
 		   ;
 whilestatement: WHILE '(' expr ')' '{' statements '}' {$$=opr(WHILE, 2, $3, $6);};
 returnstatement: RETURN expr ';' {$$ = opr(RETURN,1,$2);}
-				| RETURN ';' {$$ = opr(RETURN,0);}
+				| RETURN ';' {$$ = opr(RETURN,1,NULL);}
 				;
 assignmentstatement: lhs '=' expr ';' {$$ = opr(ASS, 2, $1, $3);}
-				   | lhs '=' NEW subrotinecall {$$ = opr(OBJDEC, 2, $1, $4);}
 				   ;
 lhs: IDENTIFIER    {$$ = id($1);}
    | IDENTIFIER '[' expr ']'  {$$ = opr(ARRAY, 2, id($1), $3);}
@@ -122,12 +119,13 @@ term: IDENTIFIER    { $$ = id($1); }
 	;
 subrotinecall: IDENTIFIER '(' expr_list ')'  { $$ = opr(FUNCTIONCALL, 2, id($1), $3); }
 			|  IDENTIFIER '.' IDENTIFIER '(' expr_list ')' { $$ = opr(METHODCALL, 3, id($1), id($3), $5); }
+			| NEW  IDENTIFIER '(' expr_list ')'  { $$ = opr(CONSTRUCTORCALL, 2, id($2), $4); }
 			;
 expr_list: expr_list ',' expr { $$ = opr(EXPRLIST, 2, $1, $3); }
-		|  expr  { $$ = $1; }
+		|  expr  { $$ = opr(EXPRLIST, 2, NULL, $1); }
 		|  { $$ = NULL; }
 		;
-keywordconstant: THIS { $$ = opr(THIS,0); }
+keywordconstant: THIS { $$ = id("this"); }
 				| True { $$ = opr(True,0); }
 				| False { $$ = opr(False,0); }
 				| Null { $$ = opr(Null,0); }

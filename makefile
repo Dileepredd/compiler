@@ -1,5 +1,5 @@
 minicc: ./yacc/y.tab.c ./lex/lex.yy.c
-	g++ y.tab.c lex.yy.c ./codegen/compile.cpp ./codegen/ast.cpp
+	g++ -g -w y.tab.c lex.yy.c ./codegen/codewriter.cpp ./codegen/ast.cpp
 ./lex/lex.yy.c: ./lex/lex.l
 	lex ./lex/lex.l
 ./yacc/y.tab.c: ./yacc/parser.y

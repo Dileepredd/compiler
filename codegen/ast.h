@@ -1,21 +1,7 @@
 
-// symbol tabel
-struct record
-{
-    int type;
-    int memseg;
-    int location;
-    char name[32];
-};
-
-typedef struct record symboltable;
-
-extern symboltable global[];
-extern symboltable current[]; 
-
-int append(int context,int type,int memseg,char* ptr);
-void clear(int context);
-
+// abstract syntax tree construction
+#ifndef AST_H
+#define AST_H
 typedef enum { typeCon, typeId, typeOpr } nodeEnum;
 
 typedef struct {
@@ -46,4 +32,4 @@ nodeType* opr(int , int , ...);
 nodeType* id(char *);
 nodeType* constint(int );
 nodeType* constchar(int );
-void compile(nodeType* );
+#endif

@@ -23,9 +23,6 @@ STRINGVALUE ["].*["]
 "["		return *yytext;
 "]"		return *yytext;
 "="		return *yytext;
-"int"		return INT;
-"char"		return CHAR;
-"boolean"	return BOOL;
 "new"		return NEW;
 "this"		return THIS;
 "true"		return True;
@@ -37,7 +34,7 @@ STRINGVALUE ["].*["]
 "while"		return WHILE;
 "class"		return CLASS;
 "static"	return STATIC;
-"void"		return VOID;
+
 {NUMBERS}		{
 	yylval.ivalue = atoi(yytext);
 	return INTCONSTANT;
