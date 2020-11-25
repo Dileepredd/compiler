@@ -2,7 +2,12 @@
 // abstract syntax tree construction
 #ifndef AST_H
 #define AST_H
-typedef enum { typeCon, typeId, typeOpr } nodeEnum;
+typedef enum { typeCon, typeId, typeOpr, typeStr } nodeEnum;
+
+typedef struct {
+    int count;
+    char* str;
+} strNodeType;
 
 typedef struct {
  int value; 
@@ -24,6 +29,7 @@ typedef struct nodeTypeTag {
  conNodeType con;
  idNodeType id; 
  oprNodeType opr; 
+ strNodeType str;
  };
 } nodeType;
 
@@ -32,4 +38,5 @@ nodeType* opr(int , int , ...);
 nodeType* id(char *);
 nodeType* constint(int );
 nodeType* constchar(int );
+nodeType* conststr(char *);
 #endif

@@ -63,3 +63,19 @@ void freeNode(nodeType *p) {
  }
  free (p);
 }
+
+nodeType* conststr(char* str)
+{
+    nodeType *p;
+    if ((p = (nodeType*)malloc(sizeof(nodeType))) == NULL)
+    yyerror("out of memory");
+    p->type = typeStr;
+    int count = 0;
+    while(str[count]!='\0')
+    {
+        count++;
+    }
+    p->str.count = count;
+    p->str.str = str;
+    return p;
+}

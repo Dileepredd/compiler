@@ -14,6 +14,7 @@ ofstream fout;
 %union{
 	nodeType *nptr;
   	int ivalue;
+	char* str;
   	char name[32];
 };
 %token ASS CLASSDEC STATIC_VARDEC VARDEC STATIC_ROTINE ROTINE CONSTRUCTOR
@@ -22,6 +23,7 @@ ofstream fout;
 %token <ivalue> INTCONSTANT
 %token <name> IDENTIFIER 
 %token <ivalue> CHARCONST
+%token <str> STRINGCONSTANT
 %type <nptr> start programstructure classdeclarations classobjvardec classobjrotinedec importstatements
 %type <nptr> constructordec rotinedec parameterslist  programstructure_
 %type <nptr> statements statement vardec varlist ifstatement whilestatement returnstatement assignmentstatement 
@@ -52,7 +54,16 @@ importstatements: importstatements IMPORT IDENTIFIER {$$ = opr(IMPORT,2,$1,id($3
 				| {$$ = NULL;}
 				;
 
-programstructure: CLASS IDENTIFIER '{' classdeclarations '}' {$$ = opr(CLASS, 2, id($2), $4);}
+programstructure: CLASS IDENTIFIER {
+					string classname = (char*)$2;
+					if(filename != classname)
+					{
+						yyerror("classname and filename didnot match");
+						exit(-1);
+					}
+					} '{' classdeclarations '}' {
+					$$ = opr(CLASS, 2, id($2), $5);
+				}
 				;
 
 classdeclarations: classdeclarations classobjvardec    {$$ = opr(CLASSDEC, 2, $1, $2);}
@@ -128,6 +139,7 @@ term: IDENTIFIER    { $$ = id($1); }
 	| subrotinecall { $$ = $1; }
 	| INTCONSTANT    { $$ = constint($1); }
 	| CHARCONST      { $$ = constchar($1); }
+	| STRINGCONSTANT { $$ = conststr($1); }
 	| keywordconstant { $$ = $1; }
 	;
 subrotinecall: IDENTIFIER '(' expr_list ')'  { $$ = opr(FUNCTIONCALL, 2, id($1), $3); }

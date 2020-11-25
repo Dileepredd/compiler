@@ -43,6 +43,21 @@ void compileexpr(nodeType* root,string &code)
     {
         code+="push constant "+to_string(root->con.value)+"\n";
     }
+    else if(root->type == typeStr)
+    {
+        int count = root->str.count;
+        char* s = root->str.str;
+        // create an object of string
+        code += "push constant " + to_string(count) + "\n";
+        code += "call String.new 1\n";
+        // appendchar
+        for(int i=0;i<count;i++)
+        {
+            int tempchar = s[i];
+            code += "push constant "+to_string(tempchar)+"\n";
+            code += "call String.appendChar 2\n";
+        }
+    }
     else
     {
         switch(root->opr.oper)

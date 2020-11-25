@@ -1,4 +1,4 @@
-function Main.main 5
+function Main.main 6
 push argument 0
 pop pointer 0
 call Keyboard.readInt 0
@@ -6,6 +6,17 @@ pop local 1
 push local 1
 call Array.new 1
 pop local 0
+push constant 4
+call String.new 1
+push constant 92
+call String.appendChar 2
+push constant 110
+call String.appendChar 2
+push constant 92
+call String.appendChar 2
+push constant 110
+call String.appendChar 2
+pop local 4
 push constant 0
 pop local 2
 label L1

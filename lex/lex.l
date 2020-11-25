@@ -11,10 +11,11 @@ LETTERS [a-zA-Z]
 IDENTIFIER ({LETTERS}|[_])({LETTERS}|{DIGITS}|[_])*
 NUMBERS [0-9]+
 CHAR ('.')
-STRINGVALUE ["].*["]
+STRINGVALUE \"(\\.|[^\\"])*\"
 %%
 [ \n\t]+	;
 "//".*		;
+"\/\*"([^\*]|\*+[^*/])*\**"/" {}
 "=="		return EQ;
 "||"		return OR;
 "&&"		return AND;
@@ -45,7 +46,6 @@ STRINGVALUE ["].*["]
 	return CHARCONST;
 }
 {IDENTIFIER}	{
-	// memset(yylval.name,'\0',sizeof(yylval.name));
 	int len = yyleng;
 	if(yyleng >= sizeof(yylval.name))
 	{
@@ -54,6 +54,14 @@ STRINGVALUE ["].*["]
 	strncpy(yylval.name,yytext,len);
 	yylval.name[len] = '\0';
 	return IDENTIFIER;
+}
+{STRINGVALUE}	{
+	char* temp = new char[yyleng];
+	memcpy(temp,yytext,yyleng);
+	temp[yyleng-1] = '\0';
+	temp = temp+1;
+	yylval.str = temp;
+	return STRINGCONSTANT;
 }
 .			{yyerror("unknown charecter\n");}
 %%
