@@ -7,4 +7,4 @@ minicc: ./yacc/y.tab.c ./lex/lex.yy.c
 clean:
 	rm -f minijavac y.tab.c lex.yy.c y.tab.h y.output
 run:
-	./minijavac ./test/test.txt
+	./minijavac ./Main.jack

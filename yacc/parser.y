@@ -8,6 +8,8 @@ int yyerror(char *);
 extern int yylineno;
 extern FILE* yyin;
 extern char* yytext;
+string filename;
+ofstream fout;
 %}
 %union{
 	nodeType *nptr;
@@ -145,6 +147,9 @@ keywordconstant: THIS { $$ = id("this"); }
 %%
 int main(int argc , char** argv){
 	if(argc < 2)cout<<"command: ./minijavac file[ex: Main.mjc]";
+	filename = argv[1];
+	filename = filename.substr(0,filename.find("."));
+	fout.open(filename+".vm");
     yyin = fopen(argv[1],"r");
     yyparse();
 }

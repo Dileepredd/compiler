@@ -8,7 +8,7 @@ void compileexpr(nodeType* root,string &code);
 void compilestatements(nodeType* root,string &code,int &count);
 string classname;
 symboltabel st;
-ofstream fout("test.vm");
+extern ofstream fout;
 int compileVL(INTO& context,kind_of& seg,string& type,nodeType* root)
 {
     if(root == nullptr)return 0;
