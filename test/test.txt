@@ -2,8 +2,10 @@ class hello
 {
     static int a,b,c;
     int d;
+    char cd;
     hello()
     {
+        cd = 'a';
         a = 1;
         b = a+2;
         c = b-a+3;

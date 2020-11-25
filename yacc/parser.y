@@ -16,12 +16,12 @@ extern char* yytext;
 };
 %token ASS CLASSDEC STATIC_VARDEC VARDEC STATIC_ROTINE ROTINE CONSTRUCTOR
 %token PARAMLIST STATEMENTS VARLIST CONSTRUCTORCALL ARRAY FUNCTIONCALL METHODCALL EXPRLIST
-%token THIS True False Null IF ELSE WHILE RETURN INT STATIC CLASS VOID CHAR BOOL NEW
+%token THIS True False Null IF ELSE WHILE RETURN INT STATIC CLASS VOID CHAR BOOL NEW IMPORT
 %token <ivalue> INTCONSTANT
 %token <name> IDENTIFIER 
 %token <ivalue> CHARCONST
-%type <nptr> start programstructure classdeclarations classobjvardec classobjrotinedec
-%type <nptr> constructordec rotinedec parameterslist 
+%type <nptr> start programstructure classdeclarations classobjvardec classobjrotinedec importstatements
+%type <nptr> constructordec rotinedec parameterslist  programstructure_
 %type <nptr> statements statement vardec varlist ifstatement whilestatement returnstatement assignmentstatement 
 %type <nptr> lhs term subrotinecall keywordconstant type expr expr_list
 %left ','
@@ -36,8 +36,19 @@ extern char* yytext;
 %nonassoc UMINUS
 
 %%
-start: programstructure {$$=$1;compile($1);cout<<"completed syntax analysis"<<endl;}
+start: programstructure_ {	
+							$$=$1;cout<<"syntax analysis is completed"<<endl;
+							compile($1);
+							cout<<"code generation is completed"<<endl;
+						}
 		; 
+
+programstructure_: importstatements {compileimports($1);} programstructure {$$ = $3;}
+				; 
+
+importstatements: importstatements IMPORT IDENTIFIER {$$ = opr(IMPORT,2,$1,id($3));}
+				| {$$ = NULL;}
+				;
 
 programstructure: CLASS IDENTIFIER '{' classdeclarations '}' {$$ = opr(CLASS, 2, id($2), $4);}
 				;
@@ -133,6 +144,7 @@ keywordconstant: THIS { $$ = id("this"); }
 
 %%
 int main(int argc , char** argv){
+	if(argc < 2)cout<<"command: ./minijavac file[ex: Main.mjc]";
     yyin = fopen(argv[1],"r");
     yyparse();
 }

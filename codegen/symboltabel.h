@@ -23,6 +23,7 @@ class symboltabel
 {
     unordered_map<string,struct record> classtable;
     unordered_map<string,struct record> methodtable;
+    unordered_set<string> allowedtypes;
     int lclcount;
     int argcount;
     int fieldcount;
@@ -36,6 +37,15 @@ class symboltabel
         fieldcount = 0;
         staticcount = 0;
         labelcount = 0;
+    }
+    bool istype(string type)
+    {
+        if(allowedtypes.find(type) == allowedtypes.end())return false;
+        return true;
+    }
+    void inserttype(string type)
+    {
+        allowedtypes.insert(type);
     }
     void clear(void)
     {
@@ -83,7 +93,7 @@ class symboltabel
         }
         return classtable[name];
     }
-    bool isinscope(INTO into,string name)
+    bool isinscope(string name)
     {
         if(methodtable.find(name) == methodtable.end())
         {

@@ -138,7 +138,7 @@ void compileexpr(nodeType* root,string &code)
                 string funcname = root->opr.op[0]->id.name;
                 int c = 0;
                 compileEL(root->opr.op[1],code,c);
-                code+="call "+funcname+" "+to_string(c)+"\n";
+                code+="call "+classname+"."+funcname+" "+to_string(c)+"\n";
             }
             break;
             case CONSTRUCTORCALL:{
@@ -155,13 +155,22 @@ void compileexpr(nodeType* root,string &code)
             case METHODCALL:{
                 int c = 0;
                 string objname = root->opr.op[0]->id.name;
-                struct record temp = st.getrecord(objname);
-                string kind = getSegement(temp.kind); 
-                code+="push "+kind+" "+to_string(temp.position)+"\n";
-                c++;
-                string funcname = root->opr.op[1]->id.name;
-                compileEL(root->opr.op[2],code,c);
-                code+="call "+funcname+" "+to_string(c)+"\n";
+                if(st.isinscope(objname))
+                {
+                    struct record temp = st.getrecord(objname);
+                    string kind = getSegement(temp.kind); 
+                    code+="push "+kind+" "+to_string(temp.position)+"\n";
+                    c++;
+                    string funcname = root->opr.op[1]->id.name;
+                    compileEL(root->opr.op[2],code,c);
+                    code+="call "+temp.type+"."+funcname+" "+to_string(c)+"\n";
+                }
+                else
+                {
+                    string funcname = root->opr.op[1]->id.name;
+                    compileEL(root->opr.op[2],code,c);
+                    code+="call "+objname+"."+funcname+" "+to_string(c)+"\n";
+                }
             }
             break;
             default:;
@@ -346,5 +355,11 @@ void compile(nodeType* root)
         classname = root->opr.op[0]->id.name;
         compileClassDec(root->opr.op[1]);
     }
-    st.print();
+    // st.print();
+}
+void compileimports(nodeType* root)
+{
+    if(root == nullptr)return;
+    compileimports(root->opr.op[0]);
+    st.inserttype(root->opr.op[1]->id.name);
 }

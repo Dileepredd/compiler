@@ -10,7 +10,7 @@ DIGITS [0-9]
 LETTERS [a-zA-Z]
 IDENTIFIER ({LETTERS}|[_])({LETTERS}|{DIGITS}|[_])*
 NUMBERS [0-9]+
-CHAR ('.'|'\\.')
+CHAR ('.')
 STRINGVALUE ["].*["]
 %%
 [ \n\t]+	;
@@ -34,13 +34,14 @@ STRINGVALUE ["].*["]
 "while"		return WHILE;
 "class"		return CLASS;
 "static"	return STATIC;
+"import"	return IMPORT;
 
 {NUMBERS}		{
 	yylval.ivalue = atoi(yytext);
 	return INTCONSTANT;
 }
 {CHAR}			{
-	yylval.ivalue = *yytext;
+	yylval.ivalue = yytext[1];
 	return CHARCONST;
 }
 {IDENTIFIER}	{
