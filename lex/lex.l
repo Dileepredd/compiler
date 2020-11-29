@@ -2,7 +2,7 @@
 #include <bits/stdc++.h>
 #include "./codegen/ast.h"
 #include "y.tab.h"
-int yyerror(char*);
+int yyerror(const char*);
 using namespace std;
 %}
 %option yylineno
@@ -13,7 +13,7 @@ NUMBERS [0-9]+
 CHAR ('.')
 STRINGVALUE \"(\\.|[^\\"])*\"
 %%
-[ \n\t]+	;
+[ \n\t\r]+	;
 "//".*		;
 "\/\*"([^\*]|\*+[^*/])*\**"/" {}
 "=="		return EQ;
@@ -63,7 +63,14 @@ STRINGVALUE \"(\\.|[^\\"])*\"
 	yylval.str = temp;
 	return STRINGCONSTANT;
 }
-.			{yyerror("unknown charecter\n");}
+.			{
+	char temp = *yytext;
+	string str;
+	str += "unknown charecter\n";
+	str += temp;
+	cout<<"what the fuck: "<<(int)temp<<endl;
+	yyerror(str.c_str());
+	}
 %%
 int yywrap(void )
 {

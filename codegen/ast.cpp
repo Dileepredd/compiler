@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #include "ast.h"
-int yyerror(char* );
+int yyerror(const char* );
 using namespace std;
 nodeType *constint(int value) {
  nodeType *p;

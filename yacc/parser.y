@@ -4,7 +4,8 @@
 #include "./codegen/codewriter.h"
 using namespace std;
 int yylex();
-int yyerror(char *);
+int yyerror(const char *);
+extern int errno;
 extern int yylineno;
 extern FILE* yyin;
 extern char* yytext;
@@ -157,15 +158,59 @@ keywordconstant: THIS { $$ = id("this"); }
 				;
 
 %%
+int findindex(string str)
+{
+	int size = str.length();
+	if(size == 0)
+	{
+		cerr<<"filename is not accepted: "<<filename<<endl;
+		exit(-1);
+	}
+	int i = size-1;
+	while(i>=0 && str[i] == ' ')i--;
+	if(i < 4)
+	{
+		cerr<<"file name is not accepted: "<<filename<<endl;
+		exit(-1);
+	}
+	if(str[i] == 'c' && str[i-1] == 'j' && str[i-2] == 'm' && str[i-3]=='.')
+	{
+		return i-3;
+	}
+	else
+	{
+		cerr<<"file name is not accepted: "<<filename<<endl;
+		exit(-1);
+	}
+}
+string findfilename(string str)
+{
+	int size = str.size();
+	int i = size-1;
+	while(i>=0 && str[i]!='/')i--;
+	if(i == -1)
+	{
+		return str;
+	}
+	else
+	{
+		return str.substr(i+1,size);
+	}
+}
 int main(int argc , char** argv){
 	if(argc < 2)cout<<"command: ./minijavac file[ex: Main.mjc]";
 	filename = argv[1];
-	filename = filename.substr(0,filename.find("."));
+	filename = filename.substr(0,findindex(filename));
+    if((yyin = fopen(argv[1],"r")) == nullptr)
+	{
+		cout<<"error: "<<strerror(errno)<<endl;
+		exit(-1);
+	}
 	fout.open(filename+".vm");
-    yyin = fopen(argv[1],"r");
+	filename = findfilename(filename);
     yyparse();
 }
-int yyerror(char *s){
+int yyerror(const char *s){
   printf("\n\nError: %s\nnot accepted\nline no:%d\n\n", s,yylineno);
   printf("%s\n\n",yytext);
 }
