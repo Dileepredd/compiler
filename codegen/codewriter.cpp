@@ -49,7 +49,7 @@ void compileexpr(nodeType* root,string &code)
         char* s = root->str.str;
         // create an object of string
         code += "push constant " + to_string(count) + "\n";
-        code += "call String.new 1\n";
+        code += "call String.newobj 1\n";
         // appendchar
         for(int i=0;i<count;i++)
         {
@@ -160,7 +160,7 @@ void compileexpr(nodeType* root,string &code)
                 string funcname = root->opr.op[0]->id.name;
                 int c = 0;
                 compileEL(root->opr.op[1],code,c);
-                code+="call "+funcname+".new "+to_string(c)+"\n";
+                code+="call "+funcname+".newobj "+to_string(c)+"\n";
             }
             break;
             case THIS:{
@@ -235,9 +235,9 @@ void compilestatement(nodeType* root,string &code,int &count)
             string label1 = st.getLabel();
             compileexpr(exp,code);
             code+="not\n";
-            code += "if-goto "+label1+"\n";
+            code += "if-goto "+classname+label1+"\n";
             compilestatements(ifsts,code,count);
-            code+= "label "+label1+"\n";
+            code+= "label "+classname+label1+"\n";
         }
         else
         {
@@ -245,12 +245,12 @@ void compilestatement(nodeType* root,string &code,int &count)
             string label2 = st.getLabel();
             compileexpr(exp,code);
             code+="not\n";
-            code += "if-goto "+label1+"\n";
+            code += "if-goto "+classname+label1+"\n";
             compilestatements(ifsts,code,count);
-            code += "goto "+label2+"\n";
-            code+= "label "+label1+"\n";
+            code += "goto "+classname+label2+"\n";
+            code+= "label "+classname+label1+"\n";
             compilestatements(elsests,code,count);
-            code += "label "+label2+"\n";
+            code += "label "+classname+label2+"\n";
         }
     }
     else if(root->opr.oper == WHILE)
@@ -259,13 +259,13 @@ void compilestatement(nodeType* root,string &code,int &count)
         nodeType* wsts = root->opr.op[1];
         string label1 = st.getLabel();
         string label2 = st.getLabel();
-        code += "label "+label1+"\n";
+        code += "label "+classname+label1+"\n";
         compileexpr(exp,code);
         code += "not\n";
-        code += "if-goto "+label2+"\n";
+        code += "if-goto "+classname+label2+"\n";
         compilestatements(wsts,code,count);
-        code += "goto "+label1+"\n";
-        code += "label "+label2+"\n";
+        code += "goto "+classname+label1+"\n";
+        code += "label "+classname+label2+"\n";
     }
     else if(root->opr.oper == RETURN)
     {
@@ -330,8 +330,8 @@ void compileRD(kind_of seg,nodeType* root)
         compilePL(root->opr.op[1]);
         string code;
         int count = 0;
-        compilestatements(root->opr.op[1],code,count);
-        fout<<"function "<<classname<<".new "<<count<<endl;
+        compilestatements(root->opr.op[2],code,count);
+        fout<<"function "<<classname<<".newobj "<<count<<endl;
         fout<<"push constant "<<blocksize<<endl;
         fout<<"call Memory.alloc 1"<<endl;
         fout<<"pop pointer 0"<<endl;
